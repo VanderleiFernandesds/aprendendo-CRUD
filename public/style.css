@@ -1,0 +1,66 @@
+* {
+
+  margin: 0;
+
+  padding: 0;
+
+  box-sizing: border-box;
+
+}
+
+body {
+
+  font-family: Arial, sans-serif;
+
+  background: #f4f4f4;
+
+  padding: 40px;
+
+}
+
+.container {
+
+  max-width: 700px;
+
+  margin: auto;
+
+}
+
+form {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+  background: white;
+
+  padding: 20px;
+
+  border-radius: 12px;
+
+}
+
+input,
+button {
+
+  padding: 14px;
+
+  border-radius: 8px;
+
+  border: 1px solid #ddd;
+
+}
+
+.user-card {
+
+  background: white;
+
+  padding: 20px;
+
+  border-radius: 12px;
+
+  margin-top: 15px;
+
+}
