@@ -2,9 +2,7 @@ import db from '../db.js';
 
 export async function getUsers(req, res) {
   try {
-    const [users] = await db.query(
-      'SELECT * FROM users'
-    );
+    const [users] = await db.query('SELECT * FROM users');
 
     res.json(users);
   } catch (error) {
@@ -18,10 +16,7 @@ export async function getUserById(req, res) {
   const { id } = req.params;
 
   try {
-    const [users] = await db.query(
-      'SELECT * FROM users WHERE id = ?',
-      [id]
-    );
+    const [users] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
 
     if (users.length === 0) {
       return res.status(404).json({
@@ -91,10 +86,7 @@ export async function deleteUser(req, res) {
   const { id } = req.params;
 
   try {
-    const [result] = await db.query(
-      'DELETE FROM users WHERE id = ?',
-      [id]
-    );
+    const [result] = await db.query('DELETE FROM users WHERE id = ?', [id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({

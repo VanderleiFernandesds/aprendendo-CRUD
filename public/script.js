@@ -1,157 +1,282 @@
-const API_URL = 'http://localhost:3000/users';
+const API_URL = "http://localhost:3000/users";
 
 let editingUserId = null;
 
-const userTableBody = document.getElementById('userTableBody');
-const userModal = document.getElementById('userModal');
-const userForm = document.getElementById('userForm');
-const modalTitle = document.getElementById('modalTitle');
-const openModalBtn = document.getElementById('openModalBtn');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const saveButton = document.getElementById('saveButton');
-const nameInput = document.getElementById('name');
-const emailInput = document.getElementById('email');
+let deletingUserId = null;
+
+const userTableBody = document.getElementById("userTableBody");
+
+const userModal = document.getElementById("userModal");
+
+const deleteModal = document.getElementById("deleteModal");
+
+const userForm = document.getElementById("userForm");
+
+const modalTitle = document.getElementById("modalTitle");
+
+const openModalBtn = document.getElementById("openModalBtn");
+
+const closeModalBtn = document.getElementById("closeModalBtn");
+
+const saveButton = document.getElementById("saveButton");
+
+const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
+const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+
+const nameInput = document.getElementById("name");
+
+const emailInput = document.getElementById("email");
 
 async function loadUsers() {
-  const response = await fetch(API_URL);
-  const users = await response.json();
+  try {
+    const response = await fetch(API_URL);
 
-  userTableBody.innerHTML = '';
+    const users = await response.json();
 
-  users.forEach((user) => {
-    userTableBody.innerHTML += `
-      <tr>
-        <td>${user.name}</td>
-        <td>${user.email}</td>
-        <td>
-          <span class="status">Ativo</span>
-        </td>
-        <td>
-          <button class="btn-edit" data-id="${user.id}">
-            Editar
-          </button>
+    userTableBody.innerHTML = "";
 
-          <button class="btn-delete" data-id="${user.id}">
-            Excluir
-          </button>
-        </td>
-      </tr>
-    `;
-  });
+    users.forEach((user) => {
+      userTableBody.innerHTML += `
+
+        <tr>
+
+          <td>
+
+            ${user.name}
+
+          </td>
+
+          <td>
+
+            ${user.email}
+
+          </td>
+
+          <td>
+
+            <span class="status">
+
+              Ativo
+
+            </span>
+
+          </td>
+
+          <td class="actions">
+
+            <button
+              class="btn-edit"
+              data-id="${user.id}"
+            >
+
+              Editar
+
+            </button>
+
+            <button
+              class="btn-delete"
+              data-id="${user.id}"
+            >
+
+              Excluir
+
+            </button>
+
+          </td>
+
+        </tr>
+
+      `;
+    });
+  } catch (error) {
+    showToast("Erro ao carregar utilizadores");
+  }
 }
 
 function openModal() {
-  userModal.classList.add('show');
+  userModal.classList.add("show");
 }
 
 function closeModal() {
-  userModal.classList.remove('show');
+  userModal.classList.remove("show");
 
   userForm.reset();
 
   editingUserId = null;
 
-  modalTitle.innerText = 'Novo Utilizador';
-  saveButton.innerText = 'Salvar';
+  modalTitle.innerText = "Novo Utilizador";
+
+  saveButton.innerText = "Salvar";
 }
 
-openModalBtn.addEventListener('click', openModal);
+openModalBtn.addEventListener(
+  "click",
 
-closeModalBtn.addEventListener('click', closeModal);
+  () => {
+    openModal();
+  },
+);
 
-userForm.addEventListener('submit', async (event) => {
-  event.preventDefault();
+closeModalBtn.addEventListener(
+  "click",
 
-  const name = nameInput.value;
-  const email = emailInput.value;
+  () => {
+    closeModal();
+  },
+);
 
-  const method = editingUserId ? 'PUT' : 'POST';
+userForm.addEventListener(
+  "submit",
 
-  const url = editingUserId
-    ? `${API_URL}/${editingUserId}`
-    : API_URL;
+  async (event) => {
+    event.preventDefault();
 
-  saveButton.disabled = true;
-  saveButton.innerText = 'Salvando...';
+    const name = nameInput.value;
 
-  await fetch(url, {
-    method,
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name,
-      email
-    })
-  });
+    const email = emailInput.value;
 
-  showToast(
-    editingUserId
-      ? 'Utilizador atualizado com sucesso'
-      : 'Utilizador criado com sucesso'
-  );
+    if (!name || !email) {
+      showToast("Preencha todos os campos");
 
-  closeModal();
+      return;
+    }
 
-  loadUsers();
+    const method = editingUserId ? "PUT" : "POST";
 
-  saveButton.disabled = false;
-  saveButton.innerText = 'Salvar';
-});
+    const url = editingUserId ? `${API_URL}/${editingUserId}` : API_URL;
 
-document.addEventListener('click', async (event) => {
-  const button = event.target;
+    try {
+      saveButton.disabled = true;
 
-  const id = button.dataset.id;
+      saveButton.innerText = "Salvando...";
 
-  if (button.classList.contains('btn-delete')) {
-    await deleteUser(id);
-  }
+      await fetch(url, {
+        method,
 
-  if (button.classList.contains('btn-edit')) {
-    await editUser(id);
-  }
-});
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-async function deleteUser(id) {
-  const confirmDelete = confirm('Deseja excluir este utilizador?');
+        body: JSON.stringify({
+          name,
+          email,
+        }),
+      });
 
-  if (!confirmDelete) return;
+      showToast(
+        editingUserId
+          ? "Utilizador atualizado com sucesso"
+          : "Utilizador criado com sucesso",
+      );
 
-  await fetch(`${API_URL}/${id}`, {
-    method: 'DELETE'
-  });
+      closeModal();
 
-  showToast('Utilizador removido com sucesso');
+      loadUsers();
+    } catch (error) {
+      showToast("Erro ao salvar utilizador");
+    } finally {
+      saveButton.disabled = false;
 
-  loadUsers();
+      saveButton.innerText = editingUserId ? "Atualizar" : "Salvar";
+    }
+  },
+);
+
+document.addEventListener(
+  "click",
+
+  async (event) => {
+    const button = event.target;
+
+    const id = button.dataset.id;
+
+    if (button.classList.contains("btn-delete")) {
+      deleteUser(id);
+    }
+
+    if (button.classList.contains("btn-edit")) {
+      editUser(id);
+    }
+  },
+);
+
+function deleteUser(id) {
+  deletingUserId = id;
+
+  deleteModal.classList.add("show");
 }
+
+cancelDeleteBtn.addEventListener(
+  "click",
+
+  () => {
+    deleteModal.classList.remove("show");
+
+    deletingUserId = null;
+  },
+);
+
+confirmDeleteBtn.addEventListener(
+  "click",
+
+  async () => {
+    if (!deletingUserId) return;
+
+    try {
+      await fetch(
+        `${API_URL}/${deletingUserId}`,
+
+        {
+          method: "DELETE",
+        },
+      );
+
+      showToast("Utilizador removido com sucesso");
+
+      deleteModal.classList.remove("show");
+
+      deletingUserId = null;
+
+      loadUsers();
+    } catch (error) {
+      showToast("Erro ao remover utilizador");
+    }
+  },
+);
 
 async function editUser(id) {
-  const response = await fetch(`${API_URL}/${id}`);
-  const user = await response.json();
+  try {
+    const response = await fetch(`${API_URL}/${id}`);
 
-  nameInput.value = user.name;
-  emailInput.value = user.email;
+    const user = await response.json();
 
-  editingUserId = id;
+    nameInput.value = user.name;
 
-  modalTitle.innerText = 'Editar Utilizador';
-  saveButton.innerText = 'Atualizar';
+    emailInput.value = user.email;
 
-  openModal();
+    editingUserId = id;
+
+    modalTitle.innerText = "Editar Utilizador";
+
+    saveButton.innerText = "Atualizar";
+
+    openModal();
+  } catch (error) {
+    showToast("Erro ao carregar utilizador");
+  }
 }
 
 function showToast(message) {
-  const toast = document.getElementById('toast');
+  const toast = document.getElementById("toast");
 
   toast.innerText = message;
-  toast.classList.add('show');
+
+  toast.classList.add("show");
 
   setTimeout(() => {
-    toast.classList.remove('show');
+    toast.classList.remove("show");
   }, 3000);
 }
 
 loadUsers();
-
