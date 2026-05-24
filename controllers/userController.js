@@ -1,105 +1,174 @@
-import db from '../db.js';
+import {
+  getAllUsers,
+  getUserById as getUserByIdService,
+  createUser as createUserService,
+  updateUser as updateUserService,
+  deleteUser as deleteUserService
+} from '../services/userService.js';
 
 export async function getUsers(req, res) {
+
   try {
-    const [users] = await db.query('SELECT * FROM users');
+
+    const users =
+      await getAllUsers();
 
     res.json(users);
+
   } catch (error) {
+
     res.status(500).json({
-      message: 'Erro ao buscar utilizadores'
+
+      message:
+        error.message
+
     });
+
   }
+
 }
 
 export async function getUserById(req, res) {
-  const { id } = req.params;
 
   try {
-    const [users] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
 
-    if (users.length === 0) {
+    const user = await getUserByIdService(
+      req.params.id
+    );
+
+    if (!user) {
+
       return res.status(404).json({
-        message: 'Utilizador não encontrado'
+
+        message:
+          'Utilizador não encontrado'
+
       });
+
     }
 
-    res.json(users[0]);
+    res.json(user);
+
   } catch (error) {
+
     res.status(500).json({
-      message: 'Erro ao buscar utilizador'
+
+      message:
+        error.message
+
     });
+
   }
+
 }
 
 export async function createUser(req, res) {
-  const { name, email } = req.body;
 
   try {
-    const [result] = await db.query(
-      `INSERT INTO users
-       (name, email)
-       VALUES (?, ?)`,
-      [name, email]
+
+    const userId = await createUserService(
+      req.body
     );
 
     res.status(201).json({
-      message: 'Utilizador criado',
-      id: result.insertId
+
+      message:
+        'Utilizador criado',
+
+      id: userId
+
     });
+
   } catch (error) {
-    res.status(500).json({
-      message: 'Erro ao criar utilizador'
+
+    res.status(400).json({
+
+      message:
+        error.message
+
     });
+
   }
+
 }
 
 export async function updateUser(req, res) {
-  const { id } = req.params;
-  const { name, email } = req.body;
 
   try {
-    const [result] = await db.query(
-      `UPDATE users
-       SET name = ?, email = ?
-       WHERE id = ?`,
-      [name, email, id]
+
+    const result = await updateUserService(
+
+      req.params.id,
+      req.body
+
     );
 
     if (result.affectedRows === 0) {
+
       return res.status(404).json({
-        message: 'Utilizador não encontrado'
+
+        message:
+          'Utilizador não encontrado'
+
       });
+
     }
 
     res.json({
-      message: 'Utilizador atualizado'
+
+      message:
+        'Utilizador atualizado'
+
     });
+
   } catch (error) {
+
     res.status(500).json({
-      message: 'Erro ao atualizar utilizador'
+
+      message:
+        error.message
+
     });
+
   }
+
 }
 
 export async function deleteUser(req, res) {
-  const { id } = req.params;
 
   try {
-    const [result] = await db.query('DELETE FROM users WHERE id = ?', [id]);
+
+    const result = await deleteUserService(
+      req.params.id
+    );
 
     if (result.affectedRows === 0) {
+
       return res.status(404).json({
-        message: 'Utilizador não encontrado'
+
+        message:
+          'Utilizador não encontrado'
+
       });
+
     }
 
     res.json({
-      message: 'Utilizador removido'
+
+      message:
+        'Utilizador removido'
+
     });
+
   } catch (error) {
+
     res.status(500).json({
-      message: 'Erro ao remover utilizador'
+
+      message:
+        error.message
+
     });
+
   }
+
 }

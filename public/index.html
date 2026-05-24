@@ -1,106 +1,73 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Dashboard CRUD</title>
+    <title>Dashboard CRUD</title>
 
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div>
+          <span class="subtitle">DASHBOARD ADMIN</span>
+          <h1>Gestão de Utilizadores</h1>
+        </div>
 
-  <div class="container">
-
-    <div class="header">
-      <div>
-        <span class="subtitle">DASHBOARD ADMIN</span>
-        <h1>Gestão de Utilizadores</h1>
+        <button id="openModalBtn">Novo Utilizador</button>
       </div>
 
-      <button id="openModalBtn">
-        Novo Utilizador
-      </button>
+      <table>
+        <thead>
+          <tr>
+            <th>NOME</th>
+            <th>EMAIL</th>
+            <th>STATUS</th>
+            <th>AÇÕES</th>
+          </tr>
+        </thead>
+
+        <tbody id="userTableBody"></tbody>
+      </table>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>NOME</th>
-          <th>EMAIL</th>
-          <th>STATUS</th>
-          <th>AÇÕES</th>
-        </tr>
-      </thead>
+    <div id="userModal" class="modal">
+      <div class="modal-content">
+        <h2 id="modalTitle">Novo Utilizador</h2>
 
-      <tbody id="userTableBody"></tbody>
-    </table>
+        <form id="userForm">
+          <input type="text" id="name" placeholder="Nome" required />
+          <input type="email" id="email" placeholder="Email" required />
 
-  </div>
+          <div class="modal-actions">
+            <button type="button" id="closeModalBtn" class="btn-secondary">
+              Cancelar
+            </button>
 
-  <div id="userModal" class="modal">
-    <div class="modal-content">
-      <h2 id="modalTitle">Novo Utilizador</h2>
+            <button type="submit" id="saveButton" class="btn-primary">
+              Salvar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
-      <form id="userForm">
-        <input type="text" id="name" placeholder="Nome" required>
-        <input type="email" id="email" placeholder="Email" required>
+    <div id="toast" class="toast"></div>
+    <div id="deleteModal" class="modal">
+      <div class="modal-content delete-modal">
+        <h2>Excluir Utilizador</h2>
+
+        <p>Tem certeza que deseja excluir este utilizador?</p>
 
         <div class="modal-actions">
-          <button type="button" id="closeModalBtn" class="btn-secondary">
-            Cancelar
-          </button>
+          <button id="cancelDeleteBtn" class="btn-secondary">Cancelar</button>
 
-          <button type="submit" id="saveButton" class="btn-primary">
-            Salvar
-          </button>
+          <button id="confirmDeleteBtn" class="btn-delete">Excluir</button>
         </div>
-      </form>
+      </div>
     </div>
-  </div>
-
-  <div id="toast" class="toast"></div>
-<div id="deleteModal" class="modal">
-
-  <div class="modal-content delete-modal">
-
-    <h2>
-
-      Excluir Utilizador
-
-    </h2>
-
-    <p>
-
-      Tem certeza que deseja excluir este utilizador?
-
-    </p>
-
-    <div class="modal-actions">
-
-      <button
-        id="cancelDeleteBtn"
-        class="btn-secondary"
-      >
-
-        Cancelar
-
-      </button>
-
-      <button
-        id="confirmDeleteBtn"
-        class="btn-delete"
-      >
-
-        Excluir
-
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-  <script src="script.js"></script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
