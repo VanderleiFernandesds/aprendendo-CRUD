@@ -9,65 +9,91 @@ const userTableBody =
 
   );
 
-  async function loadUsers() {
+async function loadUsers() {
 
-  const response =
-    await fetch(API_URL);
+  try {
 
-  const users =
-    await response.json();
+    const response =
+      await fetch(API_URL);
+
+    const users =
+      await response.json();
 
     userTableBody.innerHTML = '';
 
-users.forEach((user) => {
+    users.forEach((user) => {
 
-  userTableBody.innerHTML += `
+      userTableBody.innerHTML += `
 
-    <tr>
+        <tr>
 
-      <td>
+          <td>${user.name}</td>
 
-        ${user.name}
+          <td>${user.email}</td>
 
-      </td>
+          <td>
 
-      <td>
+            <span class="status">
 
-        ${user.email}
+              Ativo
 
-      </td>
+            </span>
 
-      <td>
+          </td>
 
-        <span class="status">
+          <td>
 
-          Ativo
+            <button class="btn-edit">
 
-        </span>
+              Editar
 
-      </td>
+            </button>
 
-      <td>
+            <button class="btn-delete">
 
-        <button class="btn-edit">
+              Excluir
 
-          Editar
+            </button>
 
-        </button>
+          </td>
 
-        <button class="btn-delete">
+        </tr>
 
-          Excluir
+      `;
 
-        </button>
+    });
 
-      </td>
+  } catch (error) {
 
-    </tr>
+    showToast(
 
-  `;
+      'Erro ao carregar utilizadores'
 
-});
+    );
+
+  }
+
+}
+
+function showToast(message) {
+
+  const toast =
+
+    document.getElementById(
+
+      'toast'
+
+    );
+
+  toast.innerText = message;
+
+  toast.style.opacity = '1';
+
+  setTimeout(() => {
+
+    toast.style.opacity = '0';
+
+  }, 3000);
 
 }
 
