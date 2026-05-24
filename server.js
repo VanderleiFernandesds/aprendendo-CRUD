@@ -2,23 +2,21 @@ import express from 'express';
 
 import cors from 'cors';
 
+import userRoutes from './routes/userRoutes.js';
+
 const app = express();
 
 app.use(cors());
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
+app.use(
 
-  res.json({
+  '/users',
 
-    message:
+  userRoutes
 
-    'API funcionando'
-
-  });
-
-});
+);
 
 app.listen(3000, () => {
 
