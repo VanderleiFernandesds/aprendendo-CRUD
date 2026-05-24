@@ -3,172 +3,91 @@ import {
   getUserById as getUserByIdService,
   createUser as createUserService,
   updateUser as updateUserService,
-  deleteUser as deleteUserService
-} from '../services/userService.js';
+  deleteUser as deleteUserService,
+} from "../services/userService.js";
 
 export async function getUsers(req, res) {
-
   try {
-
-    const users =
-      await getAllUsers();
+    const users = await getAllUsers();
 
     res.json(users);
-
   } catch (error) {
-
     res.status(500).json({
-
-      message:
-        error.message
-
+      message: error.message,
     });
-
   }
-
 }
 
 export async function getUserById(req, res) {
-
   try {
-
-    const user = await getUserByIdService(
-      req.params.id
-    );
+    const user = await getUserByIdService(req.params.id);
 
     if (!user) {
-
       return res.status(404).json({
-
-        message:
-          'Utilizador não encontrado'
-
+        message: "Utilizador não encontrado",
       });
-
     }
 
     res.json(user);
-
   } catch (error) {
-
     res.status(500).json({
-
-      message:
-        error.message
-
+      message: error.message,
     });
-
   }
-
 }
 
 export async function createUser(req, res) {
-
   try {
-
-    const userId = await createUserService(
-      req.body
-    );
+    const userId = await createUserService(req.body);
 
     res.status(201).json({
+      message: "Utilizador criado",
 
-      message:
-        'Utilizador criado',
-
-      id: userId
-
+      id: userId,
     });
-
   } catch (error) {
-
     res.status(400).json({
-
-      message:
-        error.message
-
+      message: error.message,
     });
-
   }
-
 }
 
 export async function updateUser(req, res) {
-
   try {
-
-    const result = await updateUserService(
-
-      req.params.id,
-      req.body
-
-    );
+    const result = await updateUserService(req.params.id, req.body);
 
     if (result.affectedRows === 0) {
-
       return res.status(404).json({
-
-        message:
-          'Utilizador não encontrado'
-
+        message: "Utilizador não encontrado",
       });
-
     }
 
     res.json({
-
-      message:
-        'Utilizador atualizado'
-
+      message: "Utilizador atualizado",
     });
-
   } catch (error) {
-
     res.status(500).json({
-
-      message:
-        error.message
-
+      message: error.message,
     });
-
   }
-
 }
 
 export async function deleteUser(req, res) {
-
   try {
-
-    const result = await deleteUserService(
-      req.params.id
-    );
+    const result = await deleteUserService(req.params.id);
 
     if (result.affectedRows === 0) {
-
       return res.status(404).json({
-
-        message:
-          'Utilizador não encontrado'
-
+        message: "Utilizador não encontrado",
       });
-
     }
 
     res.json({
-
-      message:
-        'Utilizador removido'
-
+      message: "Utilizador removido",
     });
-
   } catch (error) {
-
     res.status(500).json({
-
-      message:
-        error.message
-
+      message: error.message,
     });
-
   }
-
 }
