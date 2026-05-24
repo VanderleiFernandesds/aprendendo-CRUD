@@ -1,100 +1,156 @@
-const API_URL =
-  'http://localhost:3000/users';
+const API_URL = 'http://localhost:3000/users';
 
-const userTableBody =
+let editingUserId = null;
 
-  document.getElementById(
-
-    'userTableBody'
-
-  );
+const userTableBody = document.getElementById('userTableBody');
+const userModal = document.getElementById('userModal');
+const userForm = document.getElementById('userForm');
+const modalTitle = document.getElementById('modalTitle');
+const openModalBtn = document.getElementById('openModalBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const saveButton = document.getElementById('saveButton');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
 
 async function loadUsers() {
+  const response = await fetch(API_URL);
+  const users = await response.json();
 
-  try {
+  userTableBody.innerHTML = '';
 
-    const response =
-      await fetch(API_URL);
+  users.forEach((user) => {
+    userTableBody.innerHTML += `
+      <tr>
+        <td>${user.name}</td>
+        <td>${user.email}</td>
+        <td>
+          <span class="status">Ativo</span>
+        </td>
+        <td>
+          <button class="btn-edit" data-id="${user.id}">
+            Editar
+          </button>
 
-    const users =
-      await response.json();
+          <button class="btn-delete" data-id="${user.id}">
+            Excluir
+          </button>
+        </td>
+      </tr>
+    `;
+  });
+}
 
-    userTableBody.innerHTML = '';
+function openModal() {
+  userModal.classList.add('show');
+}
 
-    users.forEach((user) => {
+function closeModal() {
+  userModal.classList.remove('show');
 
-      userTableBody.innerHTML += `
+  userForm.reset();
 
-        <tr>
+  editingUserId = null;
 
-          <td>${user.name}</td>
+  modalTitle.innerText = 'Novo Utilizador';
+  saveButton.innerText = 'Salvar';
+}
 
-          <td>${user.email}</td>
+openModalBtn.addEventListener('click', openModal);
 
-          <td>
+closeModalBtn.addEventListener('click', closeModal);
 
-            <span class="status">
+userForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
 
-              Ativo
+  const name = nameInput.value;
+  const email = emailInput.value;
 
-            </span>
+  const method = editingUserId ? 'PUT' : 'POST';
 
-          </td>
+  const url = editingUserId
+    ? `${API_URL}/${editingUserId}`
+    : API_URL;
 
-          <td>
+  saveButton.disabled = true;
+  saveButton.innerText = 'Salvando...';
 
-            <button class="btn-edit">
+  await fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name,
+      email
+    })
+  });
 
-              Editar
+  showToast(
+    editingUserId
+      ? 'Utilizador atualizado com sucesso'
+      : 'Utilizador criado com sucesso'
+  );
 
-            </button>
+  closeModal();
 
-            <button class="btn-delete">
+  loadUsers();
 
-              Excluir
+  saveButton.disabled = false;
+  saveButton.innerText = 'Salvar';
+});
 
-            </button>
+document.addEventListener('click', async (event) => {
+  const button = event.target;
 
-          </td>
+  const id = button.dataset.id;
 
-        </tr>
-
-      `;
-
-    });
-
-  } catch (error) {
-
-    showToast(
-
-      'Erro ao carregar utilizadores'
-
-    );
-
+  if (button.classList.contains('btn-delete')) {
+    await deleteUser(id);
   }
 
+  if (button.classList.contains('btn-edit')) {
+    await editUser(id);
+  }
+});
+
+async function deleteUser(id) {
+  const confirmDelete = confirm('Deseja excluir este utilizador?');
+
+  if (!confirmDelete) return;
+
+  await fetch(`${API_URL}/${id}`, {
+    method: 'DELETE'
+  });
+
+  showToast('Utilizador removido com sucesso');
+
+  loadUsers();
+}
+
+async function editUser(id) {
+  const response = await fetch(`${API_URL}/${id}`);
+  const user = await response.json();
+
+  nameInput.value = user.name;
+  emailInput.value = user.email;
+
+  editingUserId = id;
+
+  modalTitle.innerText = 'Editar Utilizador';
+  saveButton.innerText = 'Atualizar';
+
+  openModal();
 }
 
 function showToast(message) {
-
-  const toast =
-
-    document.getElementById(
-
-      'toast'
-
-    );
+  const toast = document.getElementById('toast');
 
   toast.innerText = message;
-
-  toast.style.opacity = '1';
+  toast.classList.add('show');
 
   setTimeout(() => {
-
-    toast.style.opacity = '0';
-
+    toast.classList.remove('show');
   }, 3000);
-
 }
 
 loadUsers();

@@ -1,87 +1,66 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
-
 <head>
-
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Dashboard CRUD</title>
 
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
+  <link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
 
   <div class="container">
 
     <div class="header">
-
       <div>
-
-        <span class="subtitle">
-
-          DASHBOARD ADMIN
-
-        </span>
-
-        <h1>
-
-          Gestão de Utilizadores
-
-        </h1>
-
+        <span class="subtitle">DASHBOARD ADMIN</span>
+        <h1>Gestão de Utilizadores</h1>
       </div>
 
-      <button id="newUserBtn">
-
+      <button id="openModalBtn">
         Novo Utilizador
-
       </button>
-
     </div>
 
     <table>
-
       <thead>
-
         <tr>
-
           <th>NOME</th>
-
           <th>EMAIL</th>
-
           <th>STATUS</th>
-
           <th>AÇÕES</th>
-
         </tr>
-
       </thead>
 
-      <tbody id="userTableBody">
-
-      </tbody>
-
+      <tbody id="userTableBody"></tbody>
     </table>
 
   </div>
 
-  <div id="toast"></div>
+  <div id="userModal" class="modal">
+    <div class="modal-content">
+      <h2 id="modalTitle">Novo Utilizador</h2>
+
+      <form id="userForm">
+        <input type="text" id="name" placeholder="Nome" required>
+        <input type="email" id="email" placeholder="Email" required>
+
+        <div class="modal-actions">
+          <button type="button" id="closeModalBtn" class="btn-secondary">
+            Cancelar
+          </button>
+
+          <button type="submit" id="saveButton" class="btn-primary">
+            Salvar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
 
   <script src="script.js"></script>
-
-
 </body>
-
 </html>
