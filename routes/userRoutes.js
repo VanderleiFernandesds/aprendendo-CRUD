@@ -2,7 +2,10 @@ import express from 'express';
 
 import {
 
-  createUser
+  createUser,
+  getUsers,
+  updateUser,
+  deleteUser
 
 } from '../controllers/userController.js';
 
@@ -13,6 +16,30 @@ router.post(
   '/',
 
   createUser
+
+);
+
+router.get(
+
+  '/',
+
+  getUsers
+
+);
+
+router.put(
+
+  '/:id',
+
+  updateUser
+
+);
+
+router.delete(
+
+  '/:id',
+
+  deleteUser
 
 );
 
