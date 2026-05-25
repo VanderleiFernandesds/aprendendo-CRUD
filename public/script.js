@@ -40,6 +40,11 @@ async function loadUsers() {
       userTableBody.innerHTML += `
 
         <tr>
+        <td>
+
+            ${user.created_at}
+
+          </td>
 
           <td>
 

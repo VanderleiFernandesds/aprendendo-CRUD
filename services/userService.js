@@ -51,8 +51,8 @@ export async function createUser(userData) {
   const [result] = await db.query(
 
     `INSERT INTO users
-     (name, email)
-     VALUES (?, ?)`,
+     (name, email, criado_em)
+     VALUES (?, ?, ?)`,
 
     [name, email]
 
