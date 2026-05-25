@@ -38,16 +38,15 @@ export async function getUserById(req, res) {
 
 export async function createUser(req, res) {
   try {
-    const userId = await createUserService(req.body);
+    const id = await createUserService(req.body);
 
     res.status(201).json({
-      message: "Utilizador criado",
-
-      id: userId,
+      message: 'Utilizador criado',
+      id
     });
   } catch (error) {
     res.status(400).json({
-      message: error.message,
+      message: error.message
     });
   }
 }
