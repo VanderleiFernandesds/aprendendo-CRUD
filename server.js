@@ -18,4 +18,6 @@ app.listen(3000, () => {
   console.log("Servidor rodando");
 });
 
+app.use(errorHandler);
+
 import { errorHandler } from "./middlewares/errorHandler.js";
