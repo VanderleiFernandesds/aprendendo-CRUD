@@ -10,6 +10,8 @@ import {
 
 const router = express.Router();
 
+app.use(errorHandler);
+
 router.get('/', getUsers);
 
 router.get('/:id', getUserById);

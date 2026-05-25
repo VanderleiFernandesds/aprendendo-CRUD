@@ -6,16 +6,12 @@ import {
   deleteUser as deleteUserService,
 } from "../services/userService.js";
 
-export async function getUsers(req, res) {
-  try {
-    const users = await getAllUsers();
+import { asyncHandler } from "../middlewares/asyncHandler.js";
 
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
-  }
+export async function getUsers(req, res) {
+  const users = await getAllUsers();
+
+  res.json(users);
 }
 
 export async function getUserById(req, res) {
@@ -41,12 +37,12 @@ export async function createUser(req, res) {
     const id = await createUserService(req.body);
 
     res.status(201).json({
-      message: 'Utilizador criado',
-      id
+      message: "Utilizador criado",
+      id,
     });
   } catch (error) {
     res.status(400).json({
-      message: error.message
+      message: error.message,
     });
   }
 }
