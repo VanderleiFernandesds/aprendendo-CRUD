@@ -8,11 +8,15 @@ import {
 
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 
-export async function getUsers(req, res) {
-  const users = await getAllUsers();
+export const getUsers = asyncHandler(async (req, res) => {
+  const page = req.query.page || 1;
+
+  const limit = req.query.limit || 10;
+
+  const users = await getAllUsers(page, limit);
 
   res.json(users);
-}
+});
 
 export async function getUserById(req, res) {
   try {

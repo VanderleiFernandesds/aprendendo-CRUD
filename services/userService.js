@@ -1,30 +1,27 @@
-import db from '../db.js';
-import { validateUserData } from '../validations/userValidation.js';
+import db from "../db.js";
+import { validateUserData } from "../validations/userValidation.js";
 
-export async function getAllUsers() {
+export async function getAllUsers(page = 1, limit = 10) {
+  const offset = (page - 1) * limit;
 
   const [users] = await db.query(
+    `SELECT * FROM users
+     LIMIT ? OFFSET ?`,
 
-    'SELECT * FROM users'
-
+    [Number(limit), Number(offset)],
   );
 
   return users;
-
 }
 
 export async function getUserById(id) {
-
   const [users] = await db.query(
+    "SELECT * FROM users WHERE id = ?",
 
-    'SELECT * FROM users WHERE id = ?',
-
-    [id]
-
+    [id],
   );
 
   return users[0];
-
 }
 
 export async function createUser(userData) {
@@ -33,19 +30,19 @@ export async function createUser(userData) {
   const { name, email } = userData;
 
   const [existingUsers] = await db.query(
-    'SELECT * FROM users WHERE email = ?',
-    [email]
+    "SELECT * FROM users WHERE email = ?",
+    [email],
   );
 
   if (existingUsers.length > 0) {
-    throw new Error('Email já cadastrado');
+    throw new Error("Email já cadastrado");
   }
 
   const [result] = await db.query(
     `INSERT INTO users
      (name, email)
      VALUES (?, ?)`,
-    [name, email]
+    [name, email],
   );
 
   return result.insertId;
@@ -59,34 +56,29 @@ export async function updateUser(id, userData) {
   const [existingUsers] = await db.query(
     `SELECT * FROM users
      WHERE email = ? AND id != ?`,
-    [email, id]
+    [email, id],
   );
 
   if (existingUsers.length > 0) {
-    throw new Error('Email já cadastrado');
+    throw new Error("Email já cadastrado");
   }
 
   const [result] = await db.query(
     `UPDATE users
      SET name = ?, email = ?
      WHERE id = ?`,
-    [name, email, id]
+    [name, email, id],
   );
 
   return result;
 }
 
-
 export async function deleteUser(id) {
-
   const [result] = await db.query(
+    "DELETE FROM users WHERE id = ?",
 
-    'DELETE FROM users WHERE id = ?',
-
-    [id]
-
+    [id],
   );
 
   return result;
-
 }
