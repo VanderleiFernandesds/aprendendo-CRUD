@@ -1,20 +1,54 @@
+
+
 const API_URL = "http://localhost:3000/users";
 
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ESTADO GLOBAL FRONTEND
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+let usersData = [];
+
 let editingUserId = null;
+
 let deletingUserId = null;
 
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ELEMENTOS DOM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
 const userTableBody = document.getElementById("userTableBody");
+
 const userModal = document.getElementById("userModal");
+
 const deleteModal = document.getElementById("deleteModal");
+
 const userForm = document.getElementById("userForm");
+
 const modalTitle = document.getElementById("modalTitle");
+
 const openModalBtn = document.getElementById("openModalBtn");
+
 const closeModalBtn = document.getElementById("closeModalBtn");
+
 const saveButton = document.getElementById("saveButton");
+
 const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+
 const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
+
 const nameInput = document.getElementById("name");
+
 const emailInput = document.getElementById("email");
+
+const toast = document.getElementById("toast");
+
+const loading = document.getElementById("loading");
+
+const searchInput = document.getElementById("searchInput");
 
 function formatDate(date) {
   return new Date(date).toLocaleString("pt-BR", {
@@ -24,169 +58,486 @@ function formatDate(date) {
   });
 }
 
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CARREGAR UTILIZADORES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
 async function loadUsers() {
   try {
+    loading.style.display = "block";
+
     const response = await fetch(API_URL);
+
+    if (!response.ok) {
+      throw new Error("Erro ao carregar utilizadores");
+    }
+
     const users = await response.json();
 
-    userTableBody.innerHTML = "";
+    usersData = users;
 
-    users.forEach((user) => {
-      userTableBody.innerHTML += `
-        <tr>
-          <td>${formatDate(user.created_at)}</td>
-          <td>${user.name}</td>
-          <td>${user.email}</td>
-          <td>
-            <span class="status">Ativo</span>
-          </td>
-          <td class="actions">
-            <button class="btn-edit" data-id="${user.id}">
-              Editar
-            </button>
-            <button class="btn-delete" data-id="${user.id}">
-              Excluir
-            </button>
-          </td>
-        </tr>
-      `;
-    });
+    renderUsers(usersData);
   } catch (error) {
-    showToast("Erro ao carregar utilizadores");
+    showToast(error.message);
+  } finally {
+    loading.style.display = "none";
   }
 }
 
-function openModal() {
-  userModal.classList.add("show");
-}
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RENDERIZAR TABELA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
 
-function closeModal() {
-  userModal.classList.remove("show");
-  userForm.reset();
-  editingUserId = null;
-  modalTitle.innerText = "Novo Utilizador";
-  saveButton.innerText = "Salvar";
-}
+function renderUsers(users) {
+  userTableBody.innerHTML = "";
 
-openModalBtn.addEventListener("click", () => {
-  openModal();
-});
+  /*
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ESTADO VAZIO
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  */
 
-closeModalBtn.addEventListener("click", () => {
-  closeModal();
-});
+  if (users.length === 0) {
+    userTableBody.innerHTML = `
 
-userForm.addEventListener("submit", async (event) => {
-  event.preventDefault();
+      <tr>
 
-  const name = nameInput.value;
-  const email = emailInput.value;
+        <td colspan="4">
 
-  if (!name || !email) {
-    showToast("Preencha todos os campos");
+          Nenhum utilizador encontrado
+
+        </td>
+
+      </tr>
+
+    `;
+
     return;
   }
 
-  const method = editingUserId ? "PUT" : "POST";
-  const url = editingUserId ? `${API_URL}/${editingUserId}` : API_URL;
+  /*
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  RENDERIZAÇÃO
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  */
 
-  try {
-    saveButton.disabled = true;
-    saveButton.innerText = "Salvando...";
+  users.forEach((user) => {
+    userTableBody.innerHTML += `
 
-    await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        email,
-      }),
-    });
+      <tr>
 
-    showToast(
-      editingUserId
-        ? "Utilizador atualizado com sucesso"
-        : "Utilizador criado com sucesso",
-    );
+      <td>
 
-    closeModal();
-    loadUsers();
-  } catch (error) {
-    showToast("Erro ao salvar utilizador");
-  } finally {
-    saveButton.disabled = false;
-    saveButton.innerText = editingUserId ? "Atualizar" : "Salvar";
-  }
-});
+          ${formatDate(user.created_at)}
 
-document.addEventListener("click", async (event) => {
-  const button = event.target;
-  const id = button.dataset.id;
+        </td>
 
-  if (button.classList.contains("btn-delete")) {
-    deleteUser(id);
-  }
+        <td>
 
-  if (button.classList.contains("btn-edit")) {
-    editUser(id);
-  }
-});
+          ${user.name}
 
-function deleteUser(id) {
-  deletingUserId = id;
-  deleteModal.classList.add("show");
+        </td>
+
+        <td>
+
+          ${user.email}
+
+        </td>
+
+        <td>
+
+          <span class="status">
+
+            Ativo
+
+          </span>
+
+        </td>
+
+        <td class="actions">
+
+          <button
+            class="btn-edit"
+            data-id="${user.id}"
+          >
+
+            Editar
+
+          </button>
+
+          <button
+            class="btn-delete"
+            data-id="${user.id}"
+          >
+
+            Excluir
+
+          </button>
+
+        </td>
+
+      </tr>
+
+    `;
+  });
 }
 
-cancelDeleteBtn.addEventListener("click", () => {
-  deleteModal.classList.remove("show");
-  deletingUserId = null;
-});
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ABRIR MODAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
 
-confirmDeleteBtn.addEventListener("click", async () => {
-  if (!deletingUserId) return;
+function openUserModal() {
+  userModal.classList.add("show");
+}
 
-  try {
-    await fetch(`${API_URL}/${deletingUserId}`, {
-      method: "DELETE",
-    });
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FECHAR MODAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
 
-    showToast("Utilizador removido com sucesso");
-    deleteModal.classList.remove("show");
-    deletingUserId = null;
-    loadUsers();
-  } catch (error) {
-    showToast("Erro ao remover utilizador");
-  }
-});
+function closeUserModal() {
+  userModal.classList.remove("show");
+
+  userForm.reset();
+
+  editingUserId = null;
+
+  modalTitle.innerText = "Novo Utilizador";
+
+  saveButton.innerText = "Salvar";
+
+  saveButton.disabled = false;
+}
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BOTÃO NOVO UTILIZADOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+openModalBtn.addEventListener(
+  "click",
+
+  () => {
+    openUserModal();
+  },
+);
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FECHAR MODAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+closeModalBtn.addEventListener(
+  "click",
+
+  () => {
+    closeUserModal();
+  },
+);
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRIAR / EDITAR UTILIZADOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+userForm.addEventListener(
+  "submit",
+
+  async (event) => {
+    event.preventDefault();
+
+    const name = nameInput.value.trim();
+
+    const email = emailInput.value.trim();
+
+    /*
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    VALIDAÇÃO
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    */
+
+    if (!name || !email) {
+      showToast("Preencha todos os campos");
+
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      showToast("Email inválido");
+
+      return;
+    }
+
+    /*
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    DEFINE MÉTODO
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    */
+
+    const method = editingUserId ? "PUT" : "POST";
+
+    const url = editingUserId ? `${API_URL}/${editingUserId}` : API_URL;
+
+    try {
+      /*
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      LOADING BUTTON
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      */
+
+      saveButton.disabled = true;
+
+      saveButton.innerText = "Salvando...";
+
+      /*
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      REQUEST API
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      */
+
+      const response = await fetch(url, {
+        method,
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+          name,
+          email,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+
+        throw new Error(errorData.message);
+      }
+
+      /*
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      TOAST SUCESSO
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      */
+
+      showToast(editingUserId ? "Utilizador atualizado" : "Utilizador criado");
+
+      /*
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      RESET
+      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+      */
+
+      closeUserModal();
+
+      loadUsers();
+    } catch (error) {
+      showToast(error.message);
+    } finally {
+      saveButton.disabled = false;
+
+      saveButton.innerText = editingUserId ? "Atualizar" : "Salvar";
+    }
+  },
+);
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EVENT DELEGATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+document.addEventListener(
+  "click",
+
+  async (event) => {
+    const button = event.target;
+
+    const id = button.dataset.id;
+
+    /*
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    EDITAR
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    */
+
+    if (button.classList.contains("btn-edit")) {
+      await editUser(id);
+    }
+
+    /*
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    EXCLUIR
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    */
+
+    if (button.classList.contains("btn-delete")) {
+      openDeleteModal(id);
+    }
+  },
+);
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EDITAR UTILIZADOR
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
 
 async function editUser(id) {
   try {
     const response = await fetch(`${API_URL}/${id}`);
+
+    if (!response.ok) {
+      throw new Error("Erro ao carregar utilizador");
+    }
+
     const user = await response.json();
 
     nameInput.value = user.name;
+
     emailInput.value = user.email;
+
     editingUserId = id;
+
     modalTitle.innerText = "Editar Utilizador";
+
     saveButton.innerText = "Atualizar";
 
-    openModal();
+    openUserModal();
   } catch (error) {
-    showToast("Erro ao carregar utilizador");
+    showToast(error.message);
   }
 }
 
-function showToast(message) {
-  const toast = document.getElementById("toast");
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ABRIR MODAL DELETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
 
+function openDeleteModal(id) {
+  deletingUserId = id;
+
+  deleteModal.classList.add("show");
+}
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FECHAR MODAL DELETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+function closeDeleteModal() {
+  deletingUserId = null;
+
+  deleteModal.classList.remove("show");
+}
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CANCELAR DELETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+cancelDeleteBtn.addEventListener(
+  "click",
+
+  () => {
+    closeDeleteModal();
+  },
+);
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONFIRMAR DELETE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+confirmDeleteBtn.addEventListener(
+  "click",
+
+  async () => {
+    if (!deletingUserId) return;
+
+    try {
+      const response = await fetch(
+        `${API_URL}/${deletingUserId}`,
+
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao remover utilizador");
+      }
+
+      showToast("Utilizador removido");
+
+      closeDeleteModal();
+
+      loadUsers();
+    } catch (error) {
+      showToast(error.message);
+    }
+  },
+);
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BUSCA DINÂMICA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+searchInput.addEventListener(
+  "input",
+
+  () => {
+    const value = searchInput.value.toLowerCase();
+
+    const filteredUsers = usersData.filter((user) => {
+      return (
+        user.name.toLowerCase().includes(value) ||
+        user.email.toLowerCase().includes(value)
+      );
+    });
+
+    renderUsers(filteredUsers);
+  },
+);
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOAST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
+
+function showToast(message) {
   toast.innerText = message;
+
   toast.classList.add("show");
 
   setTimeout(() => {
     toast.classList.remove("show");
   }, 3000);
 }
+
+/*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+INICIALIZAÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+*/
 
 loadUsers();
