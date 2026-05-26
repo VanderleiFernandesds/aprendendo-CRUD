@@ -6,6 +6,9 @@ export async function getAllUsers(page = 1, limit = 10) {
 
   const [users] = await db.query(
     `SELECT * FROM users
+
+     WHERE status = 'active'
+
      LIMIT ? OFFSET ?`,
 
     [Number(limit), Number(offset)],
@@ -13,10 +16,9 @@ export async function getAllUsers(page = 1, limit = 10) {
 
   return users;
 }
-
 export async function getUserById(id) {
   const [users] = await db.query(
-    "SELECT * FROM users WHERE id = ?",
+    "SELECT * FROM users WHERE id = ? AND status = 'active'",
 
     [id],
   );
@@ -30,7 +32,7 @@ export async function createUser(userData) {
   const { name, email } = userData;
 
   const [existingUsers] = await db.query(
-    "SELECT * FROM users WHERE email = ?",
+    "SELECT * FROM users WHERE email = ? AND status = 'active'",
     [email],
   );
 
@@ -55,7 +57,7 @@ export async function updateUser(id, userData) {
 
   const [existingUsers] = await db.query(
     `SELECT * FROM users
-     WHERE email = ? AND id != ?`,
+     WHERE email = ? AND id != ? AND status = 'active'`,
     [email, id],
   );
 
@@ -66,7 +68,7 @@ export async function updateUser(id, userData) {
   const [result] = await db.query(
     `UPDATE users
      SET name = ?, email = ?
-     WHERE id = ?`,
+     WHERE id = ? AND status = 'active'`,
     [name, email, id],
   );
 
@@ -75,7 +77,9 @@ export async function updateUser(id, userData) {
 
 export async function deleteUser(id) {
   const [result] = await db.query(
-    "DELETE FROM users WHERE id = ?",
+    `UPDATE users
+     SET status = 'inactive'
+     WHERE id = ? AND status = 'active'`,
 
     [id],
   );

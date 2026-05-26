@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/users';
+const API_URL = "http://localhost:3000/users";
 
 let usersData = [];
 let editingUserId = null;
@@ -6,29 +6,29 @@ let deletingUserId = null;
 let currentPage = 1;
 const limit = 5;
 
-const userTableBody = document.getElementById('userTableBody');
-const userModal = document.getElementById('userModal');
-const deleteModal = document.getElementById('deleteModal');
-const userForm = document.getElementById('userForm');
-const modalTitle = document.getElementById('modalTitle');
+const userTableBody = document.getElementById("userTableBody");
+const userModal = document.getElementById("userModal");
+const deleteModal = document.getElementById("deleteModal");
+const userForm = document.getElementById("userForm");
+const modalTitle = document.getElementById("modalTitle");
 
-const openModalBtn = document.getElementById('openModalBtn');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const saveButton = document.getElementById('saveButton');
+const openModalBtn = document.getElementById("openModalBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const saveButton = document.getElementById("saveButton");
 
-const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+const confirmDeleteBtn = document.getElementById("confirmDeleteBtn");
+const cancelDeleteBtn = document.getElementById("cancelDeleteBtn");
 
-const nameInput = document.getElementById('name');
-const emailInput = document.getElementById('email');
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
 
-const toast = document.getElementById('toast');
-const loading = document.getElementById('loading');
-const searchInput = document.getElementById('searchInput');
+const toast = document.getElementById("toast");
+const loading = document.getElementById("loading");
+const searchInput = document.getElementById("searchInput");
 
-const prevPageBtn = document.getElementById('prevPageBtn');
-const nextPageBtn = document.getElementById('nextPageBtn');
-const pageNumber = document.getElementById('pageNumber');
+const prevPageBtn = document.getElementById("prevPageBtn");
+const nextPageBtn = document.getElementById("nextPageBtn");
+const pageNumber = document.getElementById("pageNumber");
 
 function formatDate(date) {
   return new Date(date).toLocaleString("pt-BR", {
@@ -40,14 +40,14 @@ function formatDate(date) {
 
 async function loadUsers() {
   try {
-    loading.style.display = 'block';
+    loading.style.display = "block";
 
     const response = await fetch(
-      `${API_URL}?page=${currentPage}&limit=${limit}`
+      `${API_URL}?page=${currentPage}&limit=${limit}`,
     );
 
     if (!response.ok) {
-      throw new Error('Erro ao carregar utilizadores');
+      throw new Error("Erro ao carregar utilizadores");
     }
 
     const users = await response.json();
@@ -60,12 +60,12 @@ async function loadUsers() {
   } catch (error) {
     showToast(error.message);
   } finally {
-    loading.style.display = 'none';
+    loading.style.display = "none";
   }
 }
 
 function renderUsers(users) {
-  userTableBody.innerHTML = '';
+  userTableBody.innerHTML = "";
 
   if (users.length === 0) {
     userTableBody.innerHTML = `
@@ -73,6 +73,7 @@ function renderUsers(users) {
         <td colspan="4">
           Nenhum utilizador encontrado
         </td>
+
       </tr>
     `;
 
@@ -90,7 +91,13 @@ function renderUsers(users) {
         <td>${user.email}</td>
 
         <td>
-          <span class="status">Ativo</span>
+          <span class="status
+
+  ${user.status === "active" ? "status-active" : "status-inactive"}">
+
+  ${user.status}
+
+</span>
         </td>
 
         <td class="actions">
@@ -114,61 +121,59 @@ function renderUsers(users) {
 }
 
 function openUserModal() {
-  userModal.classList.add('show');
+  userModal.classList.add("show");
 }
 
 function closeUserModal() {
-  userModal.classList.remove('show');
+  userModal.classList.remove("show");
 
   userForm.reset();
 
   editingUserId = null;
 
-  modalTitle.innerText = 'Novo Utilizador';
-  saveButton.innerText = 'Salvar';
+  modalTitle.innerText = "Novo Utilizador";
+  saveButton.innerText = "Salvar";
   saveButton.disabled = false;
 }
 
-openModalBtn.addEventListener('click', () => {
+openModalBtn.addEventListener("click", () => {
   openUserModal();
 });
 
-closeModalBtn.addEventListener('click', () => {
+closeModalBtn.addEventListener("click", () => {
   closeUserModal();
 });
 
-userForm.addEventListener('submit', async (event) => {
+userForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   const name = nameInput.value.trim();
   const email = emailInput.value.trim();
 
   if (!name || !email) {
-    showToast('Preencha todos os campos');
+    showToast("Preencha todos os campos");
     return;
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   if (!emailRegex.test(email)) {
-    showToast('Email inválido');
+    showToast("Email inválido");
     return;
   }
 
-  const method = editingUserId ? 'PUT' : 'POST';
+  const method = editingUserId ? "PUT" : "POST";
 
-  const url = editingUserId
-    ? `${API_URL}/${editingUserId}`
-    : API_URL;
+  const url = editingUserId ? `${API_URL}/${editingUserId}` : API_URL;
 
   try {
     saveButton.disabled = true;
-    saveButton.innerText = 'Salvando...';
+    saveButton.innerText = "Salvando...";
 
     const response = await fetch(url, {
       method,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         name,
@@ -182,11 +187,7 @@ userForm.addEventListener('submit', async (event) => {
       throw new Error(errorData.message);
     }
 
-    showToast(
-      editingUserId
-        ? 'Utilizador atualizado'
-        : 'Utilizador criado'
-    );
+    showToast(editingUserId ? "Utilizador atualizado" : "Utilizador criado");
 
     closeUserModal();
 
@@ -195,19 +196,19 @@ userForm.addEventListener('submit', async (event) => {
     showToast(error.message);
   } finally {
     saveButton.disabled = false;
-    saveButton.innerText = editingUserId ? 'Atualizar' : 'Salvar';
+    saveButton.innerText = editingUserId ? "Atualizar" : "Salvar";
   }
 });
 
-document.addEventListener('click', async (event) => {
+document.addEventListener("click", async (event) => {
   const button = event.target;
   const id = button.dataset.id;
 
-  if (button.classList.contains('btn-edit')) {
+  if (button.classList.contains("btn-edit")) {
     await editUser(id);
   }
 
-  if (button.classList.contains('btn-delete')) {
+  if (button.classList.contains("btn-delete")) {
     openDeleteModal(id);
   }
 });
@@ -217,7 +218,7 @@ async function editUser(id) {
     const response = await fetch(`${API_URL}/${id}`);
 
     if (!response.ok) {
-      throw new Error('Erro ao carregar utilizador');
+      throw new Error("Erro ao carregar utilizador");
     }
 
     const user = await response.json();
@@ -227,8 +228,8 @@ async function editUser(id) {
 
     editingUserId = id;
 
-    modalTitle.innerText = 'Editar Utilizador';
-    saveButton.innerText = 'Atualizar';
+    modalTitle.innerText = "Editar Utilizador";
+    saveButton.innerText = "Atualizar";
 
     openUserModal();
   } catch (error) {
@@ -239,32 +240,32 @@ async function editUser(id) {
 function openDeleteModal(id) {
   deletingUserId = id;
 
-  deleteModal.classList.add('show');
+  deleteModal.classList.add("show");
 }
 
 function closeDeleteModal() {
   deletingUserId = null;
 
-  deleteModal.classList.remove('show');
+  deleteModal.classList.remove("show");
 }
 
-cancelDeleteBtn.addEventListener('click', () => {
+cancelDeleteBtn.addEventListener("click", () => {
   closeDeleteModal();
 });
 
-confirmDeleteBtn.addEventListener('click', async () => {
+confirmDeleteBtn.addEventListener("click", async () => {
   if (!deletingUserId) return;
 
   try {
     const response = await fetch(`${API_URL}/${deletingUserId}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
 
     if (!response.ok) {
-      throw new Error('Erro ao remover utilizador');
+      throw new Error("Erro ao remover utilizador");
     }
 
-    showToast('Utilizador removido');
+    showToast("Utilizador removido");
 
     closeDeleteModal();
 
@@ -274,7 +275,7 @@ confirmDeleteBtn.addEventListener('click', async () => {
   }
 });
 
-searchInput.addEventListener('input', () => {
+searchInput.addEventListener("input", () => {
   const value = searchInput.value.toLowerCase();
 
   const filteredUsers = usersData.filter((user) => {
@@ -287,13 +288,13 @@ searchInput.addEventListener('input', () => {
   renderUsers(filteredUsers);
 });
 
-nextPageBtn.addEventListener('click', () => {
+nextPageBtn.addEventListener("click", () => {
   currentPage++;
 
   loadUsers();
 });
 
-prevPageBtn.addEventListener('click', () => {
+prevPageBtn.addEventListener("click", () => {
   if (currentPage === 1) return;
 
   currentPage--;
@@ -304,14 +305,11 @@ prevPageBtn.addEventListener('click', () => {
 function showToast(message) {
   toast.innerText = message;
 
-  toast.classList.add('show');
+  toast.classList.add("show");
 
   setTimeout(() => {
-    toast.classList.remove('show');
+    toast.classList.remove("show");
   }, 3000);
 }
 
 loadUsers();
-
-
-
